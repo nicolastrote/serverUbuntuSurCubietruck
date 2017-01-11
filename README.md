@@ -3,43 +3,40 @@
 Installation d'un serveur Ubuntu Xenial sur le mini-pc CubieTruck
 
 ## Installation cubietruck armbian
-Sources
-https://docs.armbian.com/User-Guide_Fine-Tuning/#how-to-change-network-configuration
-https://wiki.debian.org/fr/WiFi/HowToUse#WPA-PSK_et_WPA2-PSK
-https://samhobbs.co.uk/2015/01/dynamic-dns-ddclient-raspberry-pi-and-ubuntu
+Sources :
+ https://docs.armbian.com/User-Guide_Fine-Tuning/#how-to-change-network-configuration
+ https://wiki.debian.org/fr/WiFi/HowToUse#WPA-PSK_et_WPA2-PSK
+ https://samhobbs.co.uk/2015/01/dynamic-dns-ddclient-raspberry-pi-and-ubuntu
 
-
-Name: http://www.mysticmarguerite.com/WebDocs/Texts/LoveAsteroids.html
+ Name: http://www.mysticmarguerite.com/WebDocs/Texts/LoveAsteroids.html
 
 ## Sommaire
 
-Sources        1
-Sommaire        1
-Préparation de la carte SD pour l’installation        3
-Démarrage de la cubietruck sur la carte SD        3
-Comment s’identifier?        3
-Comment installer Ubuntu sur la NAND?        3
-Comment se connecter au wifi?        4
-Renommer Cubietruck        4
-Mise à jour du système        4
-Connexion via SSH depuis un DynDNS        5
-Sécuriser avec Fail2ban        5
-Création d’une clé publique et privée        5
-Configuration de votre routeur maison        6
-Création d’un compte chez NO-IP        6
-Utilisation de ddclient        6
-Comment se connecter localement avec l’adresse de No-ip?        7
-Si des erreurs de langues locales surviennent        7
-Sécuriser avec le firewall UFW        7
-
-
-
-
+ Sources        1
+ Sommaire        1
+ Préparation de la carte SD pour l’installation        3
+ Démarrage de la cubietruck sur la carte SD        3
+ Comment s’identifier?        3
+ Comment installer Ubuntu sur la NAND?        3
+ Comment se connecter au wifi?        4
+ Renommer Cubietruck        4
+ Mise à jour du système        4
+ Connexion via SSH depuis un DynDNS        5
+ Sécuriser avec Fail2ban        5
+ Création d’une clé publique et privée        5
+ Configuration de votre routeur maison        6
+ Création d’un compte chez NO-IP        6
+ Utilisation de ddclient        6
+ Comment se connecter localement avec l’adresse de No-ip?        7
+ Si des erreurs de langues locales surviennent        7
+ Sécuriser avec le firewall UFW        7
 
 ## Préparation de la carte SD pour l’installation
 
-Aller sur https://www.armbian.com/cubietruck/ pour télécharger l’image Ubuntu Legacy 3.4.112 (Desktop) actuellement. Attention la version debian ne reconnaît pas les claviers bluetooth!
-En ligne de commande:
+ Allez sur https://www.armbian.com/cubietruck/ pour télécharger l’image Ubuntu Legacy 3.4.112 (Desktop) actuellement.
+ Attention la version debian ne reconnaît pas les claviers bluetooth!
+ 
+ En ligne de commande:
 $ cd ~/Téléchargement
 $ wget https://www.armbian.com/donate/?f=https://image.armbian.com/Armbian_5.20_Cubietruck_Ubuntu_xenial_3.4.112.7z
 $ sudo apt-get install p7zip p7zip-full
@@ -71,23 +68,34 @@ Plusieurs options existent mais dans mon cas j’ai choisi d’installer Ubuntu 
 
 ## Comment se connecter au wifi?
 
-	.	Il faut restreindre les permissions d'accès au fichier /etc/network/interfaces, pour éviter de divulguer la clef mot de passe (PSK) (sinon, utilisez un fichier de configuration séparé tel que /etc/network/interfaces.d/wlan0 sur les versions de Debian les plus récentes)
-	.	# chmod 0600 /etc/network/interfaces
-	.	
-	.	Utilisez la phrase secrète WPA pour calculer la clé de hachage WPA PSK correcte pour votre SSID en modifiant l'exemple suivant :
-	.	$ wpa_passphrase myssid my_very_secret_passphrase
-	.	Si vous n'entrez pas la phrase secrète sur la ligne de commande, elle vous sera demandée. La commande ci-dessus donne cette sortie :
-	.	network={        ssid="myssid"        #psk="my_very_secret_passphrase"        psk=ccb290fd4fe6b22935cbae31449e050edd02ad44627b16ce0151668f5f53c01b }
-	.	Vous devrez copier entre « psk= » et la fin de la ligne dans le fichier /etc/network/interfaces.
-	.	Ouvrez /etc/network/interfaces dans un éditeur de texte :
-	.	# vim /etc/network/interfaces
-	.	
-	.	Entrez les données de votre réseau sans fil, la SSID et la Clef WPA (PSK). Par exemple :
-	.	auto wlan0 iface wlan0 inet dhcp    wpa-ssid NomRéseau    wpa-psk ccb290fd4fe6b22935cbae31449e050edd02ad44627b16ce0151668f5f53c01b
-	.	La commande auto lancera automatiquement l'interface sans fil au démarrage du système. Vous devez commenter ou supprimer cette ligne si vous ne désirez pas ce fonctionnement.
-	.	Sauvegardez et sortez de l'éditeur.
-	.	Démarrez votre interface. Wpa_suppliquant démarrera en tâche de fond
-	.	# ifup wlan0
+Il faut restreindre les permissions d'accès au fichier /etc/network/interfaces, pour éviter de divulguer la clef mot de passe (PSK) (sinon, utilisez un fichier de configuration séparé tel que /etc/network/interfaces.d/wlan0 sur les versions de Debian les plus récentes)
+	# chmod 0600 /etc/network/interfaces
+
+Utilisez la phrase secrète WPA pour calculer la clé de hachage WPA PSK correcte pour votre SSID en modifiant l'exemple suivant :
+	$ wpa_passphrase myssid my_very_secret_passphrase
+
+Si vous n'entrez pas la phrase secrète sur la ligne de commande, elle vous sera demandée. La commande ci-dessus donne cette sortie :
+  network={
+  		ssid="myssid"
+		#psk="my_very_secret_passphrase"
+		psk=ccb290fd4fe6b22935cbae31449e050edd02ad44627b16ce0151668f5f53c01b
+	}
+
+Vous devrez copier entre « psk= » et la fin de la ligne dans le fichier /etc/network/interfaces.
+Ouvrez /etc/network/interfaces dans un éditeur de texte :
+	$ sudo nano /etc/network/interfaces
+
+Entrez les données de votre réseau sans fil, la SSID et la Clef WPA (PSK). 
+Par exemple :
+	auto wlan0
+	iface wlan0 inet dhcp
+	wpa-ssid NomRéseau
+	wpa-psk ccb290fd4fe6b22935cbae31449e050edd02ad44627b16ce0151668f5f53c01b
+	
+La commande auto lancera automatiquement l'interface sans fil au démarrage du système. Vous devez commenter ou supprimer cette ligne si vous ne désirez pas ce fonctionnement.
+ Sauvegardez et sortez de l'éditeur.
+ Démarrez votre interface. Wpa_suppliquant démarrera en tâche de fond
+	$ sudo nano ifup wlan0
 
 ## Renommer Cubietruck
 
